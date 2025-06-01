@@ -15,7 +15,6 @@
     }
 
     body.dark {
-  a { color: #66d9ef !important; }
       --bg: linear-gradient(135deg, #1a1a1a, #2b2b2b);
       --card-bg: #1e1e1e;
       --text: #eee;
@@ -198,8 +197,9 @@
     }
 
     function lookup() {
-      const zip = document.getElementById("zip").value.trim();
-      if (!zip) return;
+      const zipInput = document.getElementById("zip");
+      const zip = zipInput.value.trim();
+      zipInput.value = "";
 
       const county = zipToCounty[zip];
       const output = document.getElementById("output");
