@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Florida PA Search</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 500px; margin: auto; background: #f7f7f7; }
+    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
+    #output { margin-top: 20px; font-weight: bold; color: #333; }
+  </style>
+</head>
+<body>
+  <h2>Find Your PA by ZIP Code</h2>
+  <input type="text" id="zip" placeholder="Enter ZIP code" />
+  <button onclick="lookup()">Find PA</button>
+  <div id="output"></div>
+
+  <script>
+    let zipToCounty = {};
+    let countyToPA = {};
+
+    async function loadData() {
+      const zipURL = "https://raw.githubusercontent.com/Frankbell84/PA-Search/main/zip_to_county.json";
+      const countyURL = "https://raw.githubusercontent.com/Frankbell84/PA-Search/main/county_to_pa.json";
+
+      try {
+        const [zipRes, countyRes] = await Promise.all([
+          fetch(zipURL), fetch(countyURL)
+        ]);
+        zipToCounty = await zipRes.json();
+        countyToPA = await countyRes.json();
+      } catch (err) {
+        document.getElementById("output").innerText = "Error loading data.";
+        console.error("Data load error:", err);
+      }
+    }
+
+    async function lookup() {
+      const zip = document.getElementById("zip").value.trim();
+      if (!zip) return;
+
+      const county = zipToCounty[zip];
+      if (!county) {
+        document.getElementById("output").innerText = "ZIP code not found.";
+        return;
+      }
+
+      const paLink = countyToPA[county];
+      if (paLink) {
+        document.getElementById("output").innerHTML = 
+          `County: ${county}<br><a href="${paLink}" target="_blank">Open PA Website</a>`;
+      } else {
+        document.getElementById("output").innerText = `County: ${county} (No PA link available)`;
+      }
+    }
+
+    loadData(); // Fetch the JSON data on page load
+  </script>
+</body>
+</html>
