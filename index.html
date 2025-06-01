@@ -5,9 +5,15 @@
   <meta charset="UTF-8">
   <title>Florida PA Search</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 500px; margin: auto; background: #f7f7f7; }
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; background: #f7f7f7; }
     input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
     #output { margin-top: 20px; font-weight: bold; color: #333; }
+    #history { margin-top: 30px; padding-top: 10px; border-top: 1px solid #ccc; }
+    #history h3 { margin-bottom: 10px; }
+    #history ul { list-style-type: none; padding: 0; }
+    #history li { background: #fff; margin-bottom: 8px; padding: 10px; border-radius: 5px; box-shadow: 0 0 4px rgba(0,0,0,0.05); }
+    .clear-btn { margin-top: 10px; background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+    .clear-btn:hover { background: #b52a37; }
   </style>
 </head>
 <body>
@@ -15,6 +21,12 @@
   <input type="text" id="zip" placeholder="Enter ZIP code" />
   <button onclick="lookup()">Find PA</button>
   <div id="output"></div>
+
+  <div id="history">
+    <h3>Search History</h3>
+    <ul id="historyList"></ul>
+    <button class="clear-btn" onclick="clearHistory()">Clear History</button>
+  </div>
 
   <script>
     let zipToCounty = {};
@@ -30,32 +42,63 @@
         ]);
         zipToCounty = await zipRes.json();
         countyToPA = await countyRes.json();
+        loadHistory();  // load persistent history
       } catch (err) {
         document.getElementById("output").innerText = "Error loading data.";
         console.error("Data load error:", err);
       }
     }
 
-    async function lookup() {
+    function lookup() {
       const zip = document.getElementById("zip").value.trim();
       if (!zip) return;
 
       const county = zipToCounty[zip];
+      const output = document.getElementById("output");
+
       if (!county) {
-        document.getElementById("output").innerText = "ZIP code not found.";
+        output.innerText = "ZIP code not found.";
         return;
       }
 
       const paLink = countyToPA[county];
-      if (paLink) {
-        document.getElementById("output").innerHTML = 
-          `County: ${county}<br><a href="${paLink}" target="_blank">Open PA Website</a>`;
-      } else {
-        document.getElementById("output").innerText = `County: ${county} (No PA link available)`;
-      }
+      let html = `County: ${county}<br>`;
+      html += paLink ? `<a href="${paLink}" target="_blank">Open PA Website</a>` : "(No PA link available)";
+      output.innerHTML = html;
+
+      const historyItem = { zip, county, paLink, timestamp: new Date().toLocaleString() };
+      addToHistory(historyItem);
     }
 
-    loadData(); // Fetch the JSON data on page load
+    function addToHistory(item) {
+      let history = JSON.parse(localStorage.getItem("paSearchHistory") || "[]");
+      history.unshift(item); // add to beginning
+      history = history.slice(0, 10); // keep only 10 items
+      localStorage.setItem("paSearchHistory", JSON.stringify(history));
+      renderHistory(history);
+    }
+
+    function renderHistory(history) {
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      history.forEach(entry => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${entry.zip}</strong> → ${entry.county}<br>${entry.paLink ? `<a href="${entry.paLink}" target="_blank">Open PA</a>` : "No link"}<br><small>${entry.timestamp}</small>`;
+        list.appendChild(li);
+      });
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem("paSearchHistory") || "[]");
+      renderHistory(history);
+    }
+
+    function clearHistory() {
+      localStorage.removeItem("paSearchHistory");
+      renderHistory([]);
+    }
+
+    loadData();
   </script>
 </body>
 </html>
