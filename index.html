@@ -5,19 +5,89 @@
   <meta charset="UTF-8">
   <title>Florida PA Search</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; background: #f7f7f7; }
-    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
-    #output { margin-top: 20px; font-weight: bold; color: #333; }
-    #history { margin-top: 30px; padding-top: 10px; border-top: 1px solid #ccc; }
-    #history h3 { margin-bottom: 10px; }
-    #history ul { list-style-type: none; padding: 0; }
-    #history li { background: #fff; margin-bottom: 8px; padding: 10px; border-radius: 5px; box-shadow: 0 0 4px rgba(0,0,0,0.05); }
-    .clear-btn { margin-top: 10px; background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
-    .clear-btn:hover { background: #b52a37; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header img {
+      max-width: 180px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #333;
+    }
+    input, button {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #output {
+      font-weight: bold;
+      background: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+    #history {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    #history h3 {
+      margin-bottom: 10px;
+    }
+    #history ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    #history li {
+      background: #fff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.05);
+    }
+    .clear-btn {
+      margin-top: 10px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .clear-btn:hover {
+      background: #b52a37;
+    }
   </style>
 </head>
 <body>
-  <h2>Find Your PA by ZIP Code</h2>
+
+  <div class="header">
+    <img src="NameYourCustomerLogo4.png" alt="NameYourCustomer.com Logo">
+    <h2>Florida PA Lookup Tool</h2>
+  </div>
+
   <input type="text" id="zip" placeholder="Enter ZIP code" />
   <button onclick="lookup()">Find PA</button>
   <div id="output"></div>
@@ -63,7 +133,13 @@
 
       const paLink = countyToPA[county];
       let html = `County: ${county}<br>`;
-      html += paLink ? `<a href="${paLink}" target="_blank">Open PA Website</a>` : "(No PA link available)";
+      if (paLink) {
+        html += `<a href="${paLink}" target="_blank">Open PA Website</a>`;
+        window.open(paLink, '_blank'); // auto open PA link
+      } else {
+        html += "(No PA link available)";
+      }
+
       output.innerHTML = html;
 
       const historyItem = { zip, county, paLink, timestamp: new Date().toLocaleString() };
@@ -72,8 +148,8 @@
 
     function addToHistory(item) {
       let history = JSON.parse(localStorage.getItem("paSearchHistory") || "[]");
-      history.unshift(item); // add to beginning
-      history = history.slice(0, 10); // keep only 10 items
+      history.unshift(item);
+      history = history.slice(0, 10);
       localStorage.setItem("paSearchHistory", JSON.stringify(history));
       renderHistory(history);
     }
@@ -100,5 +176,6 @@
 
     loadData();
   </script>
+
 </body>
 </html>
