@@ -5,6 +5,11 @@
   <meta charset="UTF-8">
   <title>PA Lookup Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    if (localStorage.getItem("darkMode") === "on") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
   <style>
     :root {
       --bg: linear-gradient(135deg, #e2ebf0, #cfd9df);
@@ -14,7 +19,7 @@
       --secondary: #dc3545;
     }
 
-    body.dark {
+    .dark {
       --bg: linear-gradient(135deg, #1a1a1a, #2b2b2b);
       --card-bg: #1e1e1e;
       --text: #eee;
@@ -121,10 +126,6 @@
       align-items: center;
     }
 
-    .icon {
-      margin-right: 8px;
-    }
-
     .dark-toggle {
       text-align: center;
       margin-bottom: 10px;
@@ -137,6 +138,14 @@
       border-radius: 5px;
       cursor: pointer;
       color: var(--text);
+    }
+
+    a {
+      color: var(--primary);
+    }
+
+    .dark a {
+      color: #66d9ef !important;
     }
 
     @media (max-width: 600px) {
@@ -258,21 +267,12 @@
       renderHistory([]);
     }
 
-    
-function toggleDarkMode() {
-  const isDark = document.body.classList.toggle("dark");
-  localStorage.setItem("darkMode", isDark ? "on" : "off");
-}
-
-      document.body.classList.toggle("dark");
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("darkMode", isDark ? "on" : "off");
     }
 
-    
-loadData();
-if (localStorage.getItem("darkMode") === "on") {
-  document.body.classList.add("dark");
-}
-
+    loadData();
   </script>
 </body>
 </html>
