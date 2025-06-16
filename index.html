@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -177,7 +176,6 @@
 </head>
 <body>
   <div class="container">
-
     <div class="header">
       <img src="NameYourCustomerLogo4.png" alt="PA Lookup Logo">
       <h2>Florida PA Lookup Tool</h2>
@@ -289,6 +287,14 @@
     }
 
     loadData();
+
+    // Add Enter key support for ZIP input
+    document.getElementById("zip").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        lookup();
+      }
+    });
   </script>
 </body>
 </html>
