@@ -236,6 +236,10 @@
       let html = `County: ${county}<br>`;
       if (paLink) {
         html += `<a href="${paLink}" target="_blank">Open PA Website</a>`;
+      if (county.toUpperCase().includes("LLC")) {
+        html += `<br><a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank">Check on SunBiz</a>`;
+      }
+
         window.open(paLink, '_blank');
       } else {
         html += "(No PA link available)";
