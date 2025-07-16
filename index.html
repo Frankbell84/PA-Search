@@ -189,7 +189,13 @@
       <input type="text" id="zip" placeholder="Enter ZIP code">
       <button class="primary-btn" onclick="lookup()">Find PA</button>
       <div id="output"></div>
+    
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank">
+        🔎 Search Florida Business Entities (SunBiz)
+      </a>
     </div>
+</div>
 
     <div class="card" id="history">
       <h3>History</h3>
@@ -236,10 +242,6 @@
       let html = `County: ${county}<br>`;
       if (paLink) {
         html += `<a href="${paLink}" target="_blank">Open PA Website</a>`;
-      if (county.toUpperCase().includes("LLC")) {
-        html += `<br><a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank">Check on SunBiz</a>`;
-      }
-
         window.open(paLink, '_blank');
       } else {
         html += "(No PA link available)";
