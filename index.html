@@ -4,442 +4,122 @@
   <meta charset="UTF-8">
   <title>PA Lookup Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free ZIP code tool for finding official county property appraisal resources in Florida and Texas.">
   <script>
-    if (localStorage.getItem("darkMode") === "on") {
-      document.documentElement.classList.add("dark");
-    }
+    if (localStorage.getItem("darkMode") === "on") document.documentElement.classList.add("dark");
   </script>
   <style>
-    :root {
-      --bg: linear-gradient(135deg, #e2ebf0, #cfd9df);
-      --card-bg: #ffffff;
-      --text: #222;
-      --muted: #666;
-      --primary: #007bff;
-      --secondary: #dc3545;
-      --border: #ddd;
-    }
-
-    .dark {
-      --bg: linear-gradient(135deg, #1a1a1a, #2b2b2b);
-      --card-bg: #1e1e1e;
-      --text: #eee;
-      --muted: #bbb;
-      --primary: #3399ff;
-      --secondary: #ff4d4d;
-      --border: #444;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      color: var(--text);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      padding: 20px;
-      margin-bottom: 20px;
-      transition: background 0.3s;
-    }
-
-    .header { text-align: center; }
-    .header img { width: 100px; margin-bottom: 10px; }
-    .header h2 { margin: 0; }
-    .subtitle { color: var(--muted); margin: 7px 0 0; font-size: 14px; }
-
-    select#state,
-    input#zip {
-      width: 220px;
-      margin: 10px auto 0;
-      display: block;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: var(--card-bg);
-      color: var(--text);
-    }
-
-    select:focus,
-    input:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(0,123,255,0.3);
-    }
-
-    button {
-      padding: 12px;
-      width: 100%;
-      margin-top: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.3s;
-    }
-
-    button:hover { transform: scale(1.02); }
-
-    .primary-btn,
-    .danger-btn {
-      width: 220px;
-      margin: 10px auto;
-      display: block;
-      color: white;
-    }
-
-    .primary-btn { background: var(--primary); }
-    .danger-btn { background: var(--secondary); }
-
-    #output {
-      font-weight: bold;
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    #status {
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-      margin-top: 8px;
-    }
-
-    #history ul { list-style: none; padding-left: 0; }
-
-    #history li {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 8px;
-      font-size: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .dark-toggle { text-align: center; margin-bottom: 10px; }
-
-    .dark-toggle button {
-      background: none;
-      border: 1px solid #999;
-      padding: 6px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: var(--text);
-      width: auto;
-    }
-
-    a { color: var(--primary); }
-    .dark a { color: #66d9ef !important; }
-
-    .helper-links {
-      text-align: center;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    @media (max-width: 600px) {
-      body { padding: 10px; }
-      .card { padding: 15px; }
-      .container { padding: 8px; }
-    }
+    :root{--bg:linear-gradient(135deg,#e2ebf0,#cfd9df);--card-bg:#fff;--text:#222;--muted:#666;--primary:#007bff;--secondary:#dc3545;--border:#ddd}
+    .dark{--bg:linear-gradient(135deg,#1a1a1a,#2b2b2b);--card-bg:#1e1e1e;--text:#eee;--muted:#bbb;--primary:#3399ff;--secondary:#ff4d4d;--border:#444}
+    *{box-sizing:border-box} body{background:var(--bg);font-family:'Segoe UI',sans-serif;margin:0;padding:20px;color:var(--text);transition:background .3s,color .3s}
+    .container{max-width:600px;margin:auto;padding:20px}.card{background:var(--card-bg);border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.08);padding:20px;margin-bottom:20px;transition:background .3s}
+    .header{text-align:center}.header img{width:100px;margin-bottom:10px}.header h1{font-size:24px;margin:0}.subtitle,.muted{color:var(--muted)}.subtitle{margin:7px 0 0;font-size:14px}
+    select#state,input#zip{width:220px;margin:10px auto 0;display:block;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:6px;background:var(--card-bg);color:var(--text)}
+    select:focus,input:focus{outline:none;box-shadow:0 0 0 3px rgba(0,123,255,.3)}button{padding:12px;width:100%;margin-top:10px;border:none;border-radius:6px;font-size:16px;cursor:pointer;transition:transform .2s ease,background .3s}button:hover{transform:scale(1.02)}
+    .primary-btn,.danger-btn{width:220px;margin:10px auto;display:block;color:#fff}.primary-btn{background:var(--primary)}.danger-btn{background:var(--secondary)}
+    #output{font-weight:bold;margin-top:15px;text-align:center}#status{color:var(--muted);font-size:13px;text-align:center;margin-top:8px}#history ul{list-style:none;padding-left:0}#history li{background:var(--card-bg);border:1px solid var(--border);border-radius:5px;padding:10px;margin-bottom:8px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .dark-toggle{text-align:center;margin-bottom:10px}.dark-toggle button{background:none;border:1px solid #999;padding:6px 12px;border-radius:5px;color:var(--text);width:auto}a{color:var(--primary)}.dark a{color:#66d9ef!important}.helper-links{text-align:center;margin-top:12px;font-size:14px}
+    .about-card h2{margin-top:0;font-size:20px}.about-card p{line-height:1.55;margin-bottom:0}.footer{text-align:center;font-size:13px;color:var(--muted);padding:4px 0 20px}.footer a{margin:0 7px}
+    @media(max-width:600px){body{padding:10px}.card{padding:15px}.container{padding:8px}}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <img src="NameYourCustomerLogo4.png" alt="PA Lookup Logo">
-      <h2 id="toolTitle">Florida PA Lookup Tool</h2>
+      <h1 id="toolTitle">Florida PA Lookup Tool</h1>
       <p class="subtitle" id="toolSubtitle">ZIP code → county → Property Appraiser</p>
     </div>
 
-    <div class="dark-toggle">
-      <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
-    </div>
+    <div class="dark-toggle"><button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button></div>
 
     <div class="card">
       <select id="state" aria-label="Select state" onchange="handleStateChange()">
         <option value="FL" selected>Florida</option>
         <option value="TX">Texas</option>
       </select>
-
       <input type="text" inputmode="numeric" maxlength="5" id="zip" placeholder="Enter Florida ZIP code" autocomplete="postal-code">
       <button class="primary-btn" id="lookupButton" onclick="lookup()">Find PA</button>
       <div id="output"></div>
       <div id="status">Loading Florida data…</div>
-      <div class="helper-links" id="helperLinks">
-        <a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank" rel="noopener">🔎 Search Florida Business Entities (SunBiz)</a>
-      </div>
+      <div class="helper-links" id="helperLinks"><a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank" rel="noopener">🔎 Search Florida Business Entities (SunBiz)</a></div>
     </div>
 
     <div class="card" id="history">
-      <h3>History</h3>
+      <h2>History</h2>
       <ul id="historyList"></ul>
       <button class="danger-btn" onclick="clearHistory()">Clear History</button>
+    </div>
+
+    <div class="card about-card">
+      <h2>Find the right property appraisal office faster</h2>
+      <p>This free lookup tool uses a ZIP code to identify the county and route you to the appropriate official property appraisal resource. Florida lookups connect to county Property Appraiser sites. Texas lookups connect to the Texas Comptroller county directory for local appraisal district information.</p>
+      <p class="muted" style="font-size:13px;margin-top:12px">This site is an independent utility and is not a government agency. Always verify property information with the official county or appraisal district source.</p>
+    </div>
+
+    <div class="footer">
+      <a href="about.html">About</a> · <a href="privacy.html">Privacy Policy</a> · <a href="contact.html">Contact</a>
     </div>
   </div>
 
   <script>
-    const FL_ZIP_URL = "https://raw.githubusercontent.com/Frankbell84/PA-Search/main/zip_to_county.json";
-    const FL_COUNTY_URL = "https://raw.githubusercontent.com/Frankbell84/PA-Search/main/county_to_pa.json";
-    const TX_ZIP_DATA_URL = "https://raw.githubusercontent.com/ReadyAPIs-com/curated-us-zips/main/data/us-zips.csv";
-    const TX_DIRECTORY_BASE = "https://comptroller.texas.gov/taxes/property-tax/county-directory/";
+    const FL_ZIP_URL="https://raw.githubusercontent.com/Frankbell84/PA-Search/main/zip_to_county.json";
+    const FL_COUNTY_URL="https://raw.githubusercontent.com/Frankbell84/PA-Search/main/county_to_pa.json";
+    const TX_ZIP_DATA_URL="https://raw.githubusercontent.com/ReadyAPIs-com/curated-us-zips/main/data/us-zips.csv";
+    const TX_DIRECTORY_BASE="https://comptroller.texas.gov/taxes/property-tax/county-directory/";
+    let flZipToCounty={},flCountyToPA={},txZipToCounty=null;
 
-    let flZipToCounty = {};
-    let flCountyToPA = {};
-    let txZipToCounty = null;
+    async function loadFloridaData(){
+      try{
+        const[zipRes,countyRes]=await Promise.all([fetch(FL_ZIP_URL),fetch(FL_COUNTY_URL)]);
+        if(!zipRes.ok||!countyRes.ok)throw new Error("Florida data request failed");
+        flZipToCounty=await zipRes.json();flCountyToPA=await countyRes.json();
+        if(document.getElementById("state").value==="FL")document.getElementById("status").innerText="Ready.";
+      }catch(err){console.error("Florida data load error:",err);if(document.getElementById("state").value==="FL")document.getElementById("status").innerText="Error loading Florida data."}
+    }
 
-    async function loadFloridaData() {
-      try {
-        const [zipRes, countyRes] = await Promise.all([
-          fetch(FL_ZIP_URL),
-          fetch(FL_COUNTY_URL)
-        ]);
-        if (!zipRes.ok || !countyRes.ok) throw new Error("Florida data request failed");
-        flZipToCounty = await zipRes.json();
-        flCountyToPA = await countyRes.json();
-        if (document.getElementById("state").value === "FL") {
-          document.getElementById("status").innerText = "Ready.";
-        }
-      } catch (err) {
-        console.error("Florida data load error:", err);
-        if (document.getElementById("state").value === "FL") {
-          document.getElementById("status").innerText = "Error loading Florida data.";
-        }
+    function normalizeCounty(raw){return raw.replace(/^\s*"|"\s*$/g,"").replace(/ County$/i,"").trim()}
+    function countySlug(county){return county.toLowerCase().replace(/[^a-z0-9]/g,"")}
+    function parseCsvLine(line){const values=[];let current="",inQuotes=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(inQuotes&&line[i+1]==='"'){current+='"';i++}else inQuotes=!inQuotes}else if(ch===','&&!inQuotes){values.push(current);current=""}else current+=ch}values.push(current);return values}
+
+    async function loadTexasData(){
+      if(txZipToCounty!==null)return;const status=document.getElementById("status");if(document.getElementById("state").value==="TX")status.innerText="Loading Texas ZIP-to-county data…";
+      try{
+        const cached=sessionStorage.getItem("txZipToCountyV1");if(cached){txZipToCounty=JSON.parse(cached);if(document.getElementById("state").value==="TX")status.innerText="Ready.";return}
+        const response=await fetch(TX_ZIP_DATA_URL,{cache:"force-cache"});if(!response.ok)throw new Error(`Texas ZIP data returned ${response.status}`);const text=await response.text(),lines=text.split(/\r?\n/),headers=parseCsvLine(lines[0]).map(h=>h.trim());
+        const zipIndex=headers.indexOf("zip_code"),stateIndex=headers.indexOf("state"),countyIndex=headers.indexOf("county");if(zipIndex<0||stateIndex<0||countyIndex<0)throw new Error("Unexpected Texas ZIP data format");
+        const map={};for(let i=1;i<lines.length;i++){if(!lines[i])continue;const cols=parseCsvLine(lines[i]);if((cols[stateIndex]||"").trim().toUpperCase()!=="TX")continue;const zip=(cols[zipIndex]||"").trim().padStart(5,"0"),county=normalizeCounty(cols[countyIndex]||"");if(zip&&county&&!map[zip])map[zip]=county}
+        txZipToCounty=map;try{sessionStorage.setItem("txZipToCountyV1",JSON.stringify(map))}catch(_){}if(document.getElementById("state").value==="TX")status.innerText=`Ready — ${Object.keys(map).length.toLocaleString()} Texas ZIP codes loaded.`;
+      }catch(err){console.error("Texas data load error:",err);txZipToCounty={};if(document.getElementById("state").value==="TX")status.innerHTML=`Texas ZIP data could not load. <a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Open the official Texas county directory</a>.`}
+    }
+
+    function handleStateChange(){
+      const state=document.getElementById("state").value,output=document.getElementById("output"),zip=document.getElementById("zip");output.innerHTML="";
+      if(state==="FL"){
+        document.getElementById("toolTitle").innerText="Florida PA Lookup Tool";document.getElementById("toolSubtitle").innerText="ZIP code → county → Property Appraiser";document.getElementById("lookupButton").innerText="Find PA";zip.placeholder="Enter Florida ZIP code";document.getElementById("helperLinks").innerHTML='<a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank" rel="noopener">🔎 Search Florida Business Entities (SunBiz)</a>';document.getElementById("status").innerText=Object.keys(flZipToCounty).length?"Ready.":"Loading Florida data…";
+      }else{
+        document.getElementById("toolTitle").innerText="Texas Appraisal District Lookup";document.getElementById("toolSubtitle").innerText="ZIP code → county → Texas appraisal district";document.getElementById("lookupButton").innerText="Find Appraisal District";zip.placeholder="Enter Texas ZIP code";document.getElementById("helperLinks").innerHTML=`<a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Texas Comptroller County Directory</a>`;document.getElementById("status").innerText=txZipToCounty?"Ready.":"Loading Texas ZIP-to-county data…";loadTexasData();
       }
+      loadHistory();zip.focus();
     }
 
-    function normalizeCounty(raw) {
-      return raw.replace(/^\s*"|"\s*$/g, "").replace(/ County$/i, "").trim();
-    }
-
-    function countySlug(county) {
-      return county.toLowerCase().replace(/[^a-z0-9]/g, "");
-    }
-
-    function parseCsvLine(line) {
-      const values = [];
-      let current = "";
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-          if (inQuotes && line[i + 1] === '"') {
-            current += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (ch === ',' && !inQuotes) {
-          values.push(current);
-          current = "";
-        } else {
-          current += ch;
-        }
+    function lookup(){
+      const state=document.getElementById("state").value,zipInput=document.getElementById("zip"),zip=zipInput.value.trim(),output=document.getElementById("output");
+      if(!/^\d{5}$/.test(zip)){output.innerText="Enter a valid 5-digit ZIP code.";return}
+      if(state==="FL"){
+        const county=flZipToCounty[zip];if(!county){output.innerText="ZIP code not found.";return}const paLink=flCountyToPA[county];let html=`County: ${county}<br>`;if(paLink){html+=`<a href="${paLink}" target="_blank" rel="noopener">Open PA Website</a>`;window.open(paLink,"_blank","noopener")}else html+="(No PA link available)";output.innerHTML=html;addToHistory({state:"FL",zip,county,link:paLink,timestamp:new Date().toLocaleString()});zipInput.value="";return;
       }
-      values.push(current);
-      return values;
+      if(txZipToCounty===null){output.innerText="Texas ZIP data is still loading. Try again in a moment.";return}const county=txZipToCounty[zip];if(!county){output.innerHTML=`Texas county not found for ${zip}.<br><a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Search the official Texas county directory</a>`;return}const directoryLink=`${TX_DIRECTORY_BASE}${countySlug(county)}.php`;output.innerHTML=`County: ${county}<br><a href="${directoryLink}" target="_blank" rel="noopener">Open ${county} County Appraisal District Info</a>`;window.open(directoryLink,"_blank","noopener");addToHistory({state:"TX",zip,county,link:directoryLink,timestamp:new Date().toLocaleString()});zipInput.value="";
     }
 
-    async function loadTexasData() {
-      if (txZipToCounty !== null) return;
-
-      const status = document.getElementById("status");
-      if (document.getElementById("state").value === "TX") {
-        status.innerText = "Loading Texas ZIP-to-county data…";
-      }
-
-      try {
-        const cached = sessionStorage.getItem("txZipToCountyV1");
-        if (cached) {
-          txZipToCounty = JSON.parse(cached);
-          if (document.getElementById("state").value === "TX") status.innerText = "Ready.";
-          return;
-        }
-
-        const response = await fetch(TX_ZIP_DATA_URL, { cache: "force-cache" });
-        if (!response.ok) throw new Error(`Texas ZIP data returned ${response.status}`);
-        const text = await response.text();
-        const lines = text.split(/\r?\n/);
-        const headers = parseCsvLine(lines[0]).map(h => h.trim());
-        const zipIndex = headers.indexOf("zip_code");
-        const stateIndex = headers.indexOf("state");
-        const countyIndex = headers.indexOf("county");
-        if (zipIndex < 0 || stateIndex < 0 || countyIndex < 0) throw new Error("Unexpected Texas ZIP data format");
-
-        const map = {};
-        for (let i = 1; i < lines.length; i++) {
-          if (!lines[i]) continue;
-          const cols = parseCsvLine(lines[i]);
-          if ((cols[stateIndex] || "").trim().toUpperCase() !== "TX") continue;
-          const zip = (cols[zipIndex] || "").trim().padStart(5, "0");
-          const county = normalizeCounty(cols[countyIndex] || "");
-          if (zip && county && !map[zip]) map[zip] = county;
-        }
-
-        txZipToCounty = map;
-        try { sessionStorage.setItem("txZipToCountyV1", JSON.stringify(map)); } catch (_) {}
-        if (document.getElementById("state").value === "TX") {
-          status.innerText = `Ready — ${Object.keys(map).length.toLocaleString()} Texas ZIP codes loaded.`;
-        }
-      } catch (err) {
-        console.error("Texas data load error:", err);
-        txZipToCounty = {};
-        if (document.getElementById("state").value === "TX") {
-          status.innerHTML = `Texas ZIP data could not load. <a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Open the official Texas county directory</a>.`;
-        }
-      }
-    }
-
-    function handleStateChange() {
-      const state = document.getElementById("state").value;
-      const output = document.getElementById("output");
-      const zip = document.getElementById("zip");
-      output.innerHTML = "";
-
-      if (state === "FL") {
-        document.getElementById("toolTitle").innerText = "Florida PA Lookup Tool";
-        document.getElementById("toolSubtitle").innerText = "ZIP code → county → Property Appraiser";
-        document.getElementById("lookupButton").innerText = "Find PA";
-        zip.placeholder = "Enter Florida ZIP code";
-        document.getElementById("helperLinks").innerHTML = '<a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank" rel="noopener">🔎 Search Florida Business Entities (SunBiz)</a>';
-        document.getElementById("status").innerText = Object.keys(flZipToCounty).length ? "Ready." : "Loading Florida data…";
-      } else {
-        document.getElementById("toolTitle").innerText = "Texas Appraisal District Lookup";
-        document.getElementById("toolSubtitle").innerText = "ZIP code → county → Texas appraisal district";
-        document.getElementById("lookupButton").innerText = "Find Appraisal District";
-        zip.placeholder = "Enter Texas ZIP code";
-        document.getElementById("helperLinks").innerHTML = `<a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Texas Comptroller County Directory</a>`;
-        document.getElementById("status").innerText = txZipToCounty ? "Ready." : "Loading Texas ZIP-to-county data…";
-        loadTexasData();
-      }
-
-      loadHistory();
-      zip.focus();
-    }
-
-    function lookup() {
-      const state = document.getElementById("state").value;
-      const zipInput = document.getElementById("zip");
-      const zip = zipInput.value.trim();
-      const output = document.getElementById("output");
-
-      if (!/^\d{5}$/.test(zip)) {
-        output.innerText = "Enter a valid 5-digit ZIP code.";
-        return;
-      }
-
-      if (state === "FL") {
-        const county = flZipToCounty[zip];
-        if (!county) {
-          output.innerText = "ZIP code not found.";
-          return;
-        }
-
-        const paLink = flCountyToPA[county];
-        let html = `County: ${county}<br>`;
-        if (paLink) {
-          html += `<a href="${paLink}" target="_blank" rel="noopener">Open PA Website</a>`;
-          window.open(paLink, "_blank", "noopener");
-        } else {
-          html += "(No PA link available)";
-        }
-        output.innerHTML = html;
-        addToHistory({ state: "FL", zip, county, link: paLink, timestamp: new Date().toLocaleString() });
-        zipInput.value = "";
-        return;
-      }
-
-      if (txZipToCounty === null) {
-        output.innerText = "Texas ZIP data is still loading. Try again in a moment.";
-        return;
-      }
-
-      const county = txZipToCounty[zip];
-      if (!county) {
-        output.innerHTML = `Texas county not found for ${zip}.<br><a href="${TX_DIRECTORY_BASE}" target="_blank" rel="noopener">Search the official Texas county directory</a>`;
-        return;
-      }
-
-      const directoryLink = `${TX_DIRECTORY_BASE}${countySlug(county)}.php`;
-      output.innerHTML = `County: ${county}<br><a href="${directoryLink}" target="_blank" rel="noopener">Open ${county} County Appraisal District Info</a>`;
-      window.open(directoryLink, "_blank", "noopener");
-      addToHistory({ state: "TX", zip, county, link: directoryLink, timestamp: new Date().toLocaleString() });
-      zipInput.value = "";
-    }
-
-    function historyKey() {
-      return document.getElementById("state").value === "TX" ? "txPaSearchHistory" : "paSearchHistory";
-    }
-
-    function addToHistory(item) {
-      const key = historyKey();
-      let history = JSON.parse(localStorage.getItem(key) || "[]");
-      history.unshift(item);
-      history = history.slice(0, 10);
-      localStorage.setItem(key, JSON.stringify(history));
-      renderHistory(history);
-    }
-
-    function renderHistory(history) {
-      const state = document.getElementById("state").value;
-      const list = document.getElementById("historyList");
-      list.innerHTML = "";
-
-      history.forEach(entry => {
-        const li = document.createElement("li");
-        const link = entry.link || entry.paLink || entry.directoryLink;
-        const label = state === "TX" ? "Open appraisal district info" : "Open PA";
-        li.innerHTML = `
-          <span>
-            🔍 <strong>${entry.zip}</strong> → ${entry.county}<br>
-            ${link ? `<a href="${link}" target="_blank" rel="noopener">${label}</a>` : "No link"}
-          </span>
-          <small>${entry.timestamp}</small>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    function loadHistory() {
-      const history = JSON.parse(localStorage.getItem(historyKey()) || "[]");
-      renderHistory(history);
-    }
-
-    function clearHistory() {
-      localStorage.removeItem(historyKey());
-      renderHistory([]);
-    }
-
-    function toggleDarkMode() {
-      const isDark = document.documentElement.classList.toggle("dark");
-      localStorage.setItem("darkMode", isDark ? "on" : "off");
-    }
-
-    document.getElementById("zip").addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        lookup();
-      }
-    });
-
-    loadHistory();
-    loadFloridaData();
+    function historyKey(){return document.getElementById("state").value==="TX"?"txPaSearchHistory":"paSearchHistory"}
+    function addToHistory(item){const key=historyKey();let history=JSON.parse(localStorage.getItem(key)||"[]");history.unshift(item);history=history.slice(0,10);localStorage.setItem(key,JSON.stringify(history));renderHistory(history)}
+    function renderHistory(history){const state=document.getElementById("state").value,list=document.getElementById("historyList");list.innerHTML="";history.forEach(entry=>{const li=document.createElement("li"),link=entry.link||entry.paLink||entry.directoryLink,label=state==="TX"?"Open appraisal district info":"Open PA";li.innerHTML=`<span>🔍 <strong>${entry.zip}</strong> → ${entry.county}<br>${link?`<a href="${link}" target="_blank" rel="noopener">${label}</a>`:"No link"}</span><small>${entry.timestamp}</small>`;list.appendChild(li)})}
+    function loadHistory(){renderHistory(JSON.parse(localStorage.getItem(historyKey())||"[]"))}
+    function clearHistory(){localStorage.removeItem(historyKey());renderHistory([])}
+    function toggleDarkMode(){const isDark=document.documentElement.classList.toggle("dark");localStorage.setItem("darkMode",isDark?"on":"off")}
+    document.getElementById("zip").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();lookup()}});
+    loadHistory();loadFloridaData();
   </script>
 </body>
 </html>
