@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Texas Appraisal District Lookup Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    if (localStorage.getItem("darkMode") === "on") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+  <style>
+    :root {
+      --bg: linear-gradient(135deg, #e2ebf0, #cfd9df);
+      --card-bg: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --primary: #0067c5;
+      --secondary: #dc3545;
+      --border: #ddd;
+    }
+    .dark {
+      --bg: linear-gradient(135deg, #1a1a1a, #2b2b2b);
+      --card-bg: #1e1e1e;
+      --text: #eee;
+      --muted: #bbb;
+      --primary: #4da3ff;
+      --secondary: #ff4d4d;
+      --border: #444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+    .container { max-width: 600px; margin: auto; padding: 20px; }
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: background 0.3s;
+    }
+    .header { text-align: center; }
+    .header img { width: 100px; margin-bottom: 10px; }
+    .header h2 { margin: 0; }
+    .subtitle { color: var(--muted); margin: 7px 0 0; font-size: 14px; }
+    input#zip {
+      width: 200px;
+      margin: 0 auto;
+      display: block;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,103,197,0.25); }
+    button {
+      padding: 12px;
+      width: 100%;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s;
+    }
+    button:hover { transform: scale(1.02); }
+    .primary-btn {
+      width: 200px;
+      margin: 10px auto;
+      display: block;
+      background: var(--primary);
+      color: white;
+    }
+    .danger-btn {
+      width: 200px;
+      margin: 10px auto;
+      display: block;
+      background: var(--secondary);
+      color: white;
+    }
+    #output { font-weight: bold; margin-top: 15px; text-align: center; }
+    #status { color: var(--muted); font-size: 13px; text-align: center; margin-top: 8px; }
+    #history ul { list-style: none; padding-left: 0; }
+    #history li {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .dark-toggle { text-align: center; margin-bottom: 10px; }
+    .dark-toggle button {
+      background: none;
+      border: 1px solid #999;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: var(--text);
+      width: auto;
+    }
+    a { color: var(--primary); }
+    .dark a { color: #66d9ef !important; }
+    .official-note {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 12px;
+    }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .card { padding: 15px; }
+      .container { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="../NameYourCustomerLogo4.png" alt="PA Lookup Logo">
+      <h2>Texas Appraisal District Lookup</h2>
+      <p class="subtitle">ZIP code → county → Texas appraisal district</p>
+    </div>
+
+    <div class="dark-toggle">
+      <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+    </div>
+
+    <div class="card">
+      <input type="text" inputmode="numeric" maxlength="5" id="zip" placeholder="Enter Texas ZIP code" autocomplete="postal-code">
+      <button class="primary-btn" onclick="lookup()">Find Appraisal District</button>
+      <div id="output"></div>
+      <div id="status">Loading ZIP-to-county data…</div>
+      <div class="official-note">
+        Results route through the Texas Comptroller's official county property-tax directory, which lists the county appraisal district and its website.
+      </div>
+      <div style="text-align:center; margin-top:12px;">
+        <a href="https://comptroller.texas.gov/taxes/property-tax/county-directory/" target="_blank" rel="noopener">Texas Comptroller County Directory</a>
+      </div>
+    </div>
+
+    <div class="card" id="history">
+      <h3>History</h3>
+      <ul id="historyList"></ul>
+      <button class="danger-btn" onclick="clearHistory()">Clear History</button>
+    </div>
+  </div>
+
+  <script>
+    const ZIP_DATA_URL = "https://raw.githubusercontent.com/ReadyAPIs-com/curated-us-zips/main/data/us-zips.csv";
+    const TEXAS_DIRECTORY_BASE = "https://comptroller.texas.gov/taxes/property-tax/county-directory/";
+    let zipToCounty = null;
+
+    function normalizeCounty(raw) {
+      return raw.replace(/^\s*"|"\s*$/g, "").replace(/ County$/i, "").trim();
+    }
+
+    function countySlug(county) {
+      return county.toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
+    function parseCsvLine(line) {
+      const values = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          values.push(current);
+          current = "";
+        } else current += ch;
+      }
+      values.push(current);
+      return values;
+    }
+
+    async function loadData() {
+      const status = document.getElementById("status");
+      try {
+        const cached = sessionStorage.getItem("txZipToCountyV1");
+        if (cached) {
+          zipToCounty = JSON.parse(cached);
+          status.innerText = "Ready.";
+          return;
+        }
+
+        const response = await fetch(ZIP_DATA_URL, { cache: "force-cache" });
+        if (!response.ok) throw new Error(`ZIP data returned ${response.status}`);
+        const text = await response.text();
+        const lines = text.split(/\r?\n/);
+        const headers = parseCsvLine(lines[0]).map(h => h.trim());
+        const zipIndex = headers.indexOf("zip_code");
+        const stateIndex = headers.indexOf("state");
+        const countyIndex = headers.indexOf("county");
+        if (zipIndex < 0 || stateIndex < 0 || countyIndex < 0) throw new Error("Unexpected ZIP data format");
+
+        const map = {};
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i]) continue;
+          const cols = parseCsvLine(lines[i]);
+          if ((cols[stateIndex] || "").trim().toUpperCase() !== "TX") continue;
+          const zip = (cols[zipIndex] || "").trim().padStart(5, "0");
+          const county = normalizeCounty(cols[countyIndex] || "");
+          if (zip && county && !map[zip]) map[zip] = county;
+        }
+        zipToCounty = map;
+        try { sessionStorage.setItem("txZipToCountyV1", JSON.stringify(map)); } catch (_) {}
+        status.innerText = `Ready — ${Object.keys(map).length.toLocaleString()} Texas ZIP codes loaded.`;
+      } catch (err) {
+        console.error("Data load error:", err);
+        zipToCounty = {};
+        status.innerHTML = `ZIP data could not load. <a href="${TEXAS_DIRECTORY_BASE}" target="_blank" rel="noopener">Open the official Texas county directory</a>.`;
+      }
+    }
+
+    function lookup() {
+      const zipInput = document.getElementById("zip");
+      const zip = zipInput.value.trim();
+      const output = document.getElementById("output");
+
+      if (!/^\d{5}$/.test(zip)) {
+        output.innerText = "Enter a valid 5-digit ZIP code.";
+        return;
+      }
+      if (zipToCounty === null) {
+        output.innerText = "ZIP data is still loading. Try again in a moment.";
+        return;
+      }
+
+      const county = zipToCounty[zip];
+      if (!county) {
+        output.innerHTML = `Texas county not found for ${zip}.<br><a href="${TEXAS_DIRECTORY_BASE}" target="_blank" rel="noopener">Search the official county directory</a>`;
+        return;
+      }
+
+      const directoryLink = `${TEXAS_DIRECTORY_BASE}${countySlug(county)}.php`;
+      output.innerHTML = `County: ${county}<br><a href="${directoryLink}" target="_blank" rel="noopener">Open ${county} County Appraisal District Info</a>`;
+      window.open(directoryLink, "_blank", "noopener");
+
+      addToHistory({ zip, county, directoryLink, timestamp: new Date().toLocaleString() });
+      zipInput.value = "";
+    }
+
+    function addToHistory(item) {
+      let history = JSON.parse(localStorage.getItem("txPaSearchHistory") || "[]");
+      history.unshift(item);
+      history = history.slice(0, 10);
+      localStorage.setItem("txPaSearchHistory", JSON.stringify(history));
+      renderHistory(history);
+    }
+
+    function renderHistory(history) {
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      history.forEach(entry => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>🔍 <strong>${entry.zip}</strong> → ${entry.county}<br><a href="${entry.directoryLink}" target="_blank" rel="noopener">Open appraisal district info</a></span><small>${entry.timestamp}</small>`;
+        list.appendChild(li);
+      });
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem("txPaSearchHistory") || "[]");
+      renderHistory(history);
+    }
+
+    function clearHistory() {
+      localStorage.removeItem("txPaSearchHistory");
+      renderHistory([]);
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("darkMode", isDark ? "on" : "off");
+    }
+
+    document.getElementById("zip").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        lookup();
+      }
+    });
+
+    loadHistory();
+    loadData();
+  </script>
+</body>
+</html>
